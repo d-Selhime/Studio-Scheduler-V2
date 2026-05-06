@@ -21,6 +21,11 @@ define( 'SS_API_NS',      'studio-scheduler/v1' );
 require_once SS_PLUGIN_DIR . 'includes/db.php';
 require_once SS_PLUGIN_DIR . 'includes/api.php';
 
+// Load migration page only if the file exists (delete after migrating)
+if ( file_exists( SS_PLUGIN_DIR . 'migrate.php' ) && is_admin() ) {
+    require_once SS_PLUGIN_DIR . 'migrate.php';
+}
+
 // ── Activation / Deactivation ─────────────────────────────────────────────────
 register_activation_hook( __FILE__, 'ss_activate' );
 function ss_activate() {
@@ -50,30 +55,21 @@ function ss_enqueue_assets() {
         '0.18.5',
         false
     );
-// Load api-adapter FIRST
-wp_enqueue_script(
-    'ss-api-adapter',
-    SS_PLUGIN_URL . 'assets/api-adapter.js',
-    [ 'sheetjs' ],
-    SS_VERSION,
-    true
-);
 
-// Load app.js AFTER, with api-adapter as a dependency
-wp_enqueue_script(
-    'studio-scheduler',
-    SS_PLUGIN_URL . 'assets/app.js',
-    [ 'sheetjs', 'ss-api-adapter' ],  // ← ss-api-adapter must be here
-    SS_VERSION,
-    true
-);
+    // Main app JS
+    wp_enqueue_script(
+        'studio-scheduler',
+        SS_PLUGIN_URL . 'assets/app.js',
+        [ 'sheetjs' ],
+        SS_VERSION,
+        true  // load in footer
+    );
 
     // Pass WordPress REST API info to the JS
     wp_localize_script( 'studio-scheduler', 'SS_API', [
         'root'     => esc_url_raw( rest_url( SS_API_NS ) ),
         'nonce'    => wp_create_nonce( 'wp_rest' ),
         'version'  => SS_VERSION,
-        'brandUrl' => SS_PLUGIN_URL . 'assets/brand/',
     ] );
 
     // Main app CSS (extracted from the original HTML <style> block)
