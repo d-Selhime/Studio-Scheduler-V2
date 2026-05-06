@@ -1,84 +1,212 @@
 <?php
 /**
- * One-time data migration script.
+ * Studio Scheduler — Data Migration Admin Page
+ *
+ * Registers a hidden WordPress admin page for one-time data import.
+ * Access it at: WP Admin → Tools → Scheduler Migration
+ * Or directly: https://yoursite.com/wp-admin/admin.php?page=ss-migrate
  *
  * HOW TO USE:
- * 1. Upload your JSON file to the same directory as this script and name it
- *    "migration-data.json"  (or update the path below).
- * 2. Place this file in:  /wp-content/plugins/studio-scheduler/migrate.php
- * 3. Open a browser and visit:
- *    https://yoursite.com/wp-content/plugins/studio-scheduler/migrate.php?key=CHANGE_ME
- * 4. After a successful migration, DELETE this file immediately.
- *
- * Security: The ?key= query-string guard prevents accidental public access.
- * Change MIGRATION_SECRET to something random before uploading.
+ * 1. Make sure this file is at:
+ *    /wp-content/plugins/studio-scheduler/migrate.php
+ * 2. Log into WordPress admin
+ * 3. Visit: https://yoursite.com/wp-admin/tools.php?page=ss-migrate
+ * 4. Paste your JSON data into the text area and click Import
+ * 5. After successful migration, DELETE this file
  */
 
-define( 'MIGRATION_SECRET', 'xK9mP2qR7vLds' );
+if ( ! defined( 'ABSPATH' ) ) exit;
 
-// ── Guard ─────────────────────────────────────────────────────────────────────
-if ( ( $_GET['key'] ?? '' ) !== MIGRATION_SECRET ) {
-    http_response_code( 403 );
-    die( 'Forbidden. Add ?key=YOUR_SECRET to the URL.' );
+// ── Register admin menu page ──────────────────────────────────────────────────
+add_action( 'admin_menu', 'ss_migrate_menu' );
+function ss_migrate_menu() {
+    add_management_page(
+        'Scheduler Migration',
+        'Scheduler Migration',
+        'manage_options',
+        'ss-migrate',
+        'ss_migrate_page'
+    );
 }
 
-// ── Bootstrap WordPress ───────────────────────────────────────────────────────
-$wp_load = __DIR__ . '/../../../wp-load.php'; // adjust if plugin is in a sub-folder
-if ( ! file_exists( $wp_load ) ) {
-    die( 'Could not find wp-load.php. Check the path at line ' . __LINE__ . '.' );
-}
-require_once $wp_load;
+// ── Admin page ────────────────────────────────────────────────────────────────
+function ss_migrate_page() {
+    require_once SS_PLUGIN_DIR . 'includes/db.php';
+    require_once SS_PLUGIN_DIR . 'includes/api.php';
+    ss_create_tables();
 
-// ── Make sure the plugin tables exist ────────────────────────────────────────
-require_once __DIR__ . '/includes/db.php';
-ss_create_tables();
-require_once __DIR__ . '/includes/api.php'; // for ss_db_upsert_job etc.
+    $message  = '';
+    $error    = '';
+    $stats    = [];
 
-// ── Load JSON ─────────────────────────────────────────────────────────────────
-$json_path = __DIR__ . '/migration-data.json';
-if ( ! file_exists( $json_path ) ) {
-    die( 'migration-data.json not found in ' . __DIR__ );
-}
+    if (
+        isset( $_POST['ss_migrate_submit'] ) &&
+        check_admin_referer( 'ss_migrate_action', 'ss_migrate_nonce' )
+    ) {
+        $json_raw = stripslashes( $_POST['ss_json_data'] ?? '' );
 
-$raw     = file_get_contents( $json_path );
-$payload = json_decode( $raw, true );
+        if ( empty( $json_raw ) ) {
+            $error = 'No JSON data provided.';
+        } else {
+            $payload = json_decode( $json_raw, true );
 
-if ( ! $payload || ! is_array( $payload ) ) {
-    die( 'Failed to parse JSON. Check the file for syntax errors.' );
-}
+            if ( ! $payload || ! is_array( $payload ) ) {
+                $error = 'Invalid JSON — check your data for syntax errors.';
+            } else {
+                $jobs        = $payload['jobs'] ?? [];
+                $ok          = 0;
+                $fail        = 0;
+                $failures    = [];
+                $import_mode = $_POST['import_mode'] ?? 'replace';
 
-// ── Migrate jobs ──────────────────────────────────────────────────────────────
-$jobs = $payload['jobs'] ?? [];
-echo '<h2>Migrating ' . count( $jobs ) . ' jobs…</h2><ul>';
+                if ( $import_mode === 'replace' ) {
+                    global $wpdb;
+                    $wpdb->query( "DELETE FROM {$wpdb->prefix}ss_jobs" );
+                }
 
-$ok = 0; $fail = 0;
-foreach ( $jobs as $job ) {
-    $result = ss_db_upsert_job( (array) $job );
-    if ( is_wp_error( $result ) ) {
-        echo '<li style="color:red;">FAIL: ' . esc_html( $job['name'] ?? $job['id'] ) . ' — ' . esc_html( $result->get_error_message() ) . '</li>';
-        $fail++;
-    } else {
-        $ok++;
+                foreach ( $jobs as $job ) {
+                    $result = ss_db_upsert_job( (array) $job );
+                    if ( is_wp_error( $result ) ) {
+                        $fail++;
+                        $failures[] = ( $job['name'] ?? $job['id'] ?? 'unknown' ) . ': ' . $result->get_error_message();
+                    } else {
+                        $ok++;
+                    }
+                }
+                $stats['jobs_ok']       = $ok;
+                $stats['jobs_fail']     = $fail;
+                $stats['jobs_failures'] = $failures;
+
+                $users = $payload['users'] ?? [];
+                if ( ! empty( $users ) ) {
+                    ss_db_bulk_replace_users( $users );
+                    $stats['users'] = count( $users );
+                }
+
+                $settings = [];
+                foreach ( [ 'anchorDate', 'currentHorizonDays', 'lastEditedBy', 'lastEditedAt' ] as $key ) {
+                    if ( array_key_exists( $key, $payload ) ) {
+                        $settings[ $key ] = (string) $payload[ $key ];
+                    }
+                }
+                if ( $settings ) {
+                    ss_db_update_settings( $settings );
+                    $stats['settings'] = $settings;
+                }
+
+                $message = 'Migration complete!';
+            }
+        }
     }
-}
-echo '</ul><p>' . $ok . ' jobs inserted/updated, ' . $fail . ' failed.</p>';
 
-// ── Migrate users ─────────────────────────────────────────────────────────────
-$users = $payload['users'] ?? [];
-echo '<h2>Migrating ' . count( $users ) . ' users…</h2>';
-ss_db_bulk_replace_users( $users );
-echo '<p>Done.</p>';
+    // Current DB counts
+    global $wpdb;
+    $job_count  = (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$wpdb->prefix}ss_jobs" );
+    $user_count = (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$wpdb->prefix}ss_users" );
+    $settings   = ss_db_get_all_settings();
+    ?>
+    <div class="wrap">
+        <h1>📅 Studio Scheduler — Data Migration</h1>
+        <p style="color:#6b7280;">Import your existing JSON data into the WordPress database. <strong>Delete this file after a successful migration.</strong></p>
 
-// ── Migrate settings ──────────────────────────────────────────────────────────
-$settings = [];
-foreach ( [ 'anchorDate', 'currentHorizonDays', 'lastEditedBy', 'lastEditedAt' ] as $key ) {
-    if ( array_key_exists( $key, $payload ) ) {
-        $settings[ $key ] = (string) $payload[ $key ];
+        <?php if ( $error ) : ?>
+            <div class="notice notice-error"><p><strong>Error:</strong> <?php echo esc_html( $error ); ?></p></div>
+        <?php endif; ?>
+
+        <?php if ( $message ) : ?>
+            <div class="notice notice-success">
+                <p><strong>✓ <?php echo esc_html( $message ); ?></strong></p>
+                <ul>
+                    <li>✅ <strong><?php echo (int) $stats['jobs_ok']; ?></strong> jobs imported</li>
+                    <?php if ( ! empty( $stats['jobs_fail'] ) ) : ?>
+                        <li>❌ <strong><?php echo (int) $stats['jobs_fail']; ?></strong> jobs failed</li>
+                    <?php endif; ?>
+                    <?php if ( isset( $stats['users'] ) ) : ?>
+                        <li>✅ <strong><?php echo (int) $stats['users']; ?></strong> users imported</li>
+                    <?php endif; ?>
+                    <?php if ( ! empty( $stats['settings'] ) ) : ?>
+                        <li>✅ Settings saved</li>
+                    <?php endif; ?>
+                </ul>
+                <p style="color:#dc2626; font-weight:600;">⚠️ Please delete migrate.php from your plugin folder now!</p>
+            </div>
+        <?php endif; ?>
+
+        <!-- Current DB Status -->
+        <div style="background:#f0fdf4; border:1px solid #bbf7d0; border-radius:8px; padding:16px; max-width:860px; margin-bottom:20px;">
+            <h3 style="margin-top:0; color:#166534;">Current Database Status</h3>
+            <ul style="margin:0;">
+                <li>📋 <strong><?php echo $job_count; ?></strong> jobs in database</li>
+                <li>👥 <strong><?php echo $user_count; ?></strong> users in database</li>
+                <?php if ( ! empty( $settings['lastEditedBy'] ) ) : ?>
+                    <li>✏️ Last edited by <strong><?php echo esc_html( $settings['lastEditedBy'] ); ?></strong> at <?php echo esc_html( $settings['lastEditedAt'] ?? '' ); ?></li>
+                <?php endif; ?>
+            </ul>
+        </div>
+
+        <!-- Import Form -->
+        <div style="background:#fff; border:1px solid #e5e7eb; border-radius:8px; padding:24px; max-width:860px;">
+            <form method="post">
+                <?php wp_nonce_field( 'ss_migrate_action', 'ss_migrate_nonce' ); ?>
+
+                <div style="margin-bottom:16px;">
+                    <label style="font-weight:600; display:block; margin-bottom:8px;">Import Mode:</label>
+                    <label style="margin-right:20px;">
+                        <input type="radio" name="import_mode" value="replace" checked>
+                        <strong>Replace</strong> — clear existing jobs and import fresh
+                    </label>
+                    <label>
+                        <input type="radio" name="import_mode" value="append">
+                        <strong>Append</strong> — add to existing jobs
+                    </label>
+                </div>
+
+                <div style="margin-bottom:16px;">
+                    <label for="ss_json_data" style="font-weight:600; display:block; margin-bottom:8px;">
+                        Paste your JSON data here:
+                    </label>
+                    <textarea
+                        id="ss_json_data"
+                        name="ss_json_data"
+                        rows="20"
+                        style="width:100%; font-family:monospace; font-size:0.82rem; border:1px solid #d1d5db; border-radius:6px; padding:10px; background:#f8fafc;"
+                        placeholder='Paste the full contents of your JSON file here...'
+                    ></textarea>
+                </div>
+
+                <div style="display:flex; gap:10px; align-items:center;">
+                    <input type="submit" name="ss_migrate_submit" class="button button-primary button-large" value="Import Data" onclick="return confirmImport();">
+                    <button type="button" class="button button-secondary" onclick="validateJson();">Validate JSON</button>
+                    <span id="validateMsg" style="font-size:0.85rem;"></span>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+    function validateJson() {
+        const raw = document.getElementById('ss_json_data').value.trim();
+        const msg = document.getElementById('validateMsg');
+        if (!raw) { msg.textContent = '⚠️ No data entered.'; msg.style.color = '#f97316'; return; }
+        try {
+            const d = JSON.parse(raw);
+            const jobs  = Array.isArray(d.jobs)  ? d.jobs.length  : '—';
+            const users = Array.isArray(d.users) ? d.users.length : '—';
+            msg.textContent = `✅ Valid — ${jobs} jobs, ${users} users found.`;
+            msg.style.color = '#16a34a';
+        } catch(e) {
+            msg.textContent = '❌ Invalid JSON: ' + e.message;
+            msg.style.color = '#dc2626';
+        }
     }
+    function confirmImport() {
+        const raw = document.getElementById('ss_json_data').value.trim();
+        if (!raw) { alert('Please paste your JSON data first.'); return false; }
+        try { JSON.parse(raw); } catch(e) { alert('Invalid JSON: ' + e.message); return false; }
+        const mode = document.querySelector('input[name="import_mode"]:checked').value;
+        const warn = mode === 'replace' ? '\n\n⚠️ This will DELETE all existing jobs first.' : '';
+        return confirm('Import data into the database?' + warn);
+    }
+    </script>
+    <?php
 }
-if ( $settings ) {
-    ss_db_update_settings( $settings );
-    echo '<h2>Settings saved:</h2><pre>' . esc_html( print_r( $settings, true ) ) . '</pre>';
-}
-
-echo '<hr><p style="color:green; font-weight:bold;">✓ Migration complete. DELETE this file now!</p>';
