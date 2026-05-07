@@ -1092,10 +1092,12 @@ function changeUserName() {
   if (name) {
     currentUserName = name;
     localStorage.setItem("schedulerUserName", currentUserName);
-    ensureUserName();
-    SS_WP.init();
+    resolveUserRole();
+    applyRoleUI();
+    updateUserDisplay();
   }
 }
+
 window.changeUserName = changeUserName;
 function startFsaPoll() {
   stopFsaPoll();
