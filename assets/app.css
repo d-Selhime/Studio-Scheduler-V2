@@ -35,8 +35,8 @@
 
 @font-face {
     font-family: 'ATT Aleck Sans';
-    src: url('fonts/ATTAleckSans_W_BD.woff2') format('woff2'),
-         url('fonts/ATTAleckSans_W_BD.woff') format('woff');
+    src: url('fonts/ATTAleckSans_W_Bd.woff2') format('woff2'),
+         url('fonts/ATTAleckSans_W_Bd.woff') format('woff');
     font-weight: 700;
     font-style: normal;
     font-display: swap;
