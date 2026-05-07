@@ -1103,6 +1103,11 @@ function changeUserName() {
 }
 
 window.changeUserName = changeUserName;
+
+const navUserNotYou = document.getElementById("navUserNotYou");
+if (navUserNotYou) navUserNotYou.addEventListener("click", changeUserName);
+
+
 function startFsaPoll() {
   stopFsaPoll();
   pollIntervalId = setInterval(checkForExternalUpdates, 900000); // check every 15 minutes

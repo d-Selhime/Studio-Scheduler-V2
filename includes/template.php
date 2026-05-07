@@ -43,14 +43,14 @@ $logo_svg = SS_PLUGIN_URL . 'assets/brand/1876-logo.svg';
           View
         </span>
         <div id="navUserDisplay"
-             onclick="changeUserName()"
+            
              title="Click to change your name"
              style="font-size:0.95rem; font-weight:600; color:#0ea5e9; cursor:pointer;
                     white-space:nowrap; padding:5px 10px; border-radius:6px;
                     border:1px solid #0ea5e9; background:rgba(14,165,233,0.08);">
         </div>
         <span id="navUserNotYou"
-              onclick="changeUserName()"
+             
               title="Click to change your name"
               style="font-size:0.78rem; color:#94a3b8; cursor:pointer; white-space:nowrap;
                      text-decoration:underline; display:none;">
