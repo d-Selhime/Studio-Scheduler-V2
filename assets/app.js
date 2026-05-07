@@ -1094,7 +1094,11 @@ function changeUserName() {
     localStorage.setItem("schedulerUserName", currentUserName);
     resolveUserRole();
     applyRoleUI();
-    updateUserDisplay();
+    // Update all name display elements directly
+    const navUser = document.getElementById("navUserDisplay");
+    if (navUser) navUser.textContent = currentUserName;
+    const fsaUser = document.getElementById("fsaUserDisplay");
+    if (fsaUser) fsaUser.textContent = currentUserName;
   }
 }
 
