@@ -443,6 +443,7 @@ $logo_svg = SS_PLUGIN_URL . 'assets/brand/1876-logo.svg';
               </div>
               <div style="display:flex; gap:6px; align-items:center; flex-shrink:0;">
     <span id="fsaStatus" style="font-size:0.7rem; white-space:nowrap; color:var(--muted);">&#9675; Loading...</span>
+    <span id="fsaUserDisplay" style="font-size: 0.7rem; white-space:nowrap;color:var(--muted);"></span>
     <button type="button" class="btn btn-secondary" id="connectFileBtn" style="font-size:0.72rem; padding:4px 10px; background:#22c55e; color:#fff; border-color:#22c55e;">Connected to Database</button>
                 <button type="button" class="btn btn-secondary" id="importExcelBtn" style="font-size:0.72rem; padding:4px 10px;">Import Excel</button>
                 <button type="button" class="btn btn-secondary" id="importUsersExcelBtn" style="font-size:0.72rem; padding:4px 10px;">Import Users</button>
