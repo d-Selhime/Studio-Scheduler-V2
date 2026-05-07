@@ -70,6 +70,7 @@ function ss_enqueue_assets() {
         'root'     => esc_url_raw( rest_url( SS_API_NS ) ),
         'nonce'    => wp_create_nonce( 'wp_rest' ),
         'version'  => SS_VERSION,
+        'brandUrl' => SS_PLUGIN_URL . 'assets/brand/',
     ] );
 
     // Main app CSS (extracted from the original HTML <style> block)
