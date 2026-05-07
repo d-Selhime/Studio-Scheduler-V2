@@ -850,6 +850,21 @@ $logo_svg = SS_PLUGIN_URL . 'assets/brand/1876-logo.svg';
       </div>
     </div>
   </div>
+  
+  <!-- ── New Job Modal ──────────────────────────────────────────────────────── -->
+  <div id="jobFormModal" style="display:none; position:fixed; inset:0; z-index:900; overflow-y:auto; background:rgba(0,0,0,0.55); padding:24px 16px;">
+    <div style="max-width:960px; margin:0 auto; background:#fff; border-radius:12px; box-shadow:0 24px 64px rgba(0,0,0,0.45); overflow:hidden; display:flex; flex-direction:column;">
+      <div style="display:flex; align-items:center; justify-content:space-between; padding:14px 20px; background:#00388F; color:#fff; flex-shrink:0;">
+        <span style="font-weight:700; font-size:1rem; letter-spacing:0.02em;">New Job</span>
+        <button id="jobFormModalClose" style="background:none; border:none; color:#fff; font-size:1.6rem; line-height:1; cursor:pointer; padding:0 4px;">&times;</button>
+      </div>
+      <div id="jobFormModalBody" style="overflow-y:auto; max-height:calc(100vh - 200px);"></div>
+      <div style="display:flex; justify-content:flex-end; gap:10px; padding:12px 20px; border-top:1px solid #e5e7eb; flex-shrink:0; background:#f9fafb;">
+        <button id="jobFormModalCancel" style="padding:7px 20px; border-radius:6px; border:1px solid #d1d5db; background:#fff; cursor:pointer; font-size:0.85rem; font-weight:600;">Cancel</button>
+        <button id="jobFormModalSave" style="padding:7px 20px; border-radius:6px; border:none; background:#00388F; color:#fff; cursor:pointer; font-size:0.85rem; font-weight:700;">Save Job</button>
+      </div>
+    </div>
+  </div>
 
 </div><!-- /#ss-root -->
 
