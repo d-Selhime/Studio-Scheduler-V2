@@ -655,7 +655,11 @@ let currentUserName =
 let inMemoryLastEditedAt = null;
 let pollIntervalId = null;
 
-window.currentUserName = currentUserName;
+// Expose currentUserName as a live getter so api-adapter can always read it
+Object.defineProperty(window, 'currentUserName', {
+    get: function() { return currentUserName; },
+    set: function(val) { currentUserName = val; }
+});
 
 // ── LOB ownership groups ─────────────────────────────────────────────
 const LOB_GROUPS = {

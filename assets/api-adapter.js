@@ -203,11 +203,10 @@ async function loadFromApi() {
         const payload = await apiFetch('/data');
         if (payload && Array.isArray(payload.jobs)) {
             applyLoadedState(payload, { fromEmbedded: false });
-            // Re-resolve role now that users array is populated
             if (window.resolveUserRole) {
-                resolveUserRole(currentUserName);
+                window.resolveUserRole(window.currentUserName);
             }
-            if (window.applyRoleUI) applyRoleUI();
+            if (window.applyRoleUI) window.applyRoleUI();
             renderSchedule();
             setStatus('connected', 'Loaded from database');
         }
