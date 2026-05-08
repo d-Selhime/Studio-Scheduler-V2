@@ -1315,11 +1315,5 @@ body.input-view .schedule-header div {
   font-weight: 600;
   cursor: pointer;
 }
-/* Parentheses around user name */
-#fsaUserDisplay:not(:empty)::before {
-    content: '(';
-}
-#fsaUserDisplay:not(:empty)::after {
-    content: ')';
-}
+
 
