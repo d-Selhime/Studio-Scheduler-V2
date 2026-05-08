@@ -1096,7 +1096,7 @@ function changeUserName() {
   if (name) {
     currentUserName = name;
     localStorage.setItem("schedulerUserName", currentUserName);
-    resolveUserRole();
+    resolveUserRole(name); // pass name directly
     applyRoleUI();
     // Update all name display elements directly
     const navUser = document.getElementById("navUserDisplay");
