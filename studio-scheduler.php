@@ -57,13 +57,22 @@ function ss_enqueue_assets() {
         false
     );
 
+    // API adapter — must load before app.js
+    wp_enqueue_script(
+        'studio-scheduler-adapter',
+        SS_PLUGIN_URL . 'assets/api-adapter.js',
+        [ 'sheetjs' ],
+        SS_VERSION,
+        true
+    );
+
     // Main app JS
     wp_enqueue_script(
         'studio-scheduler',
         SS_PLUGIN_URL . 'assets/app.js',
-        [ 'sheetjs' ],
+        [ 'sheetjs', 'studio-scheduler-adapter' ],
         SS_VERSION,
-        true  // load in footer
+        true
     );
 
     // Pass WordPress REST API info to the JS
