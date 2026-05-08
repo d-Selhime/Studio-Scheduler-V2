@@ -21,8 +21,11 @@ define( 'SS_API_NS',      'studio-scheduler/v1' );
 require_once SS_PLUGIN_DIR . 'includes/db.php';
 require_once SS_PLUGIN_DIR . 'includes/api.php';
 
-// migrate.php block removed — the file lived at assets/brand/migrate.php (web-accessible path,
-// security risk). Delete that file from the server and run the migration manually if needed.
+// Load the one-time migration admin page only while migrate.php exists.
+// DELETE migrate.php from the server immediately after a successful import.
+if ( file_exists( SS_PLUGIN_DIR . 'migrate.php' ) && is_admin() ) {
+    require_once SS_PLUGIN_DIR . 'migrate.php';
+}
 
 // ── Activation / Deactivation ─────────────────────────────────────────────────
 register_activation_hook( __FILE__, 'ss_activate' );
