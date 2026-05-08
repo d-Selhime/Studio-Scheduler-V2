@@ -3,7 +3,7 @@
  * Plugin Name:  Studio Production Scheduler
  * Plugin URI:   https://1876productions.com
  * Description:  1876 Productions Studio Scheduler — calendar, status report, and capacity planning.
- * Version:      1.0.0
+ * Version:      2.4.26
  * Author:       1876 Productions
  * License:      Private
  *
@@ -12,7 +12,7 @@
 
 if ( ! defined( 'ABSPATH' ) ) exit;
 
-define( 'SS_VERSION',     '1.0.0' );
+define( 'SS_VERSION',     '2.4.26' );
 define( 'SS_PLUGIN_DIR',  plugin_dir_path( __FILE__ ) );
 define( 'SS_PLUGIN_URL',  plugin_dir_url( __FILE__ ) );
 define( 'SS_API_NS',      'studio-scheduler/v1' );
@@ -21,10 +21,8 @@ define( 'SS_API_NS',      'studio-scheduler/v1' );
 require_once SS_PLUGIN_DIR . 'includes/db.php';
 require_once SS_PLUGIN_DIR . 'includes/api.php';
 
-// Load migration page only if the file exists (delete after migrating)
-if ( file_exists( SS_PLUGIN_DIR . 'migrate.php' ) && is_admin() ) {
-    require_once SS_PLUGIN_DIR . 'migrate.php';
-}
+// migrate.php block removed — the file lived at assets/brand/migrate.php (web-accessible path,
+// security risk). Delete that file from the server and run the migration manually if needed.
 
 // ── Activation / Deactivation ─────────────────────────────────────────────────
 register_activation_hook( __FILE__, 'ss_activate' );

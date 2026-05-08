@@ -63,25 +63,26 @@ const SS_WP = (() => {
   function setStatus(state, msg) {
     const colors = { connected: '#22c55e', saving: '#f97316', error: '#ef4444' };
     const icons  = { connected: '●', saving: '↑', error: '○' };
-      // Update all fsaStatus spans on the page
-    document.querySelectorAll('#fsaStatus').forEach(el => {
-        el.textContent = (icons[state] || '○') + ' ' + (msg || '');
-        el.style.color = colors[state] || '#9ca3af';
+
+    // Update every status span (navbar + calendar view both use .ss-fsa-status)
+    document.querySelectorAll('#fsaStatus, #fsaStatusCal').forEach(el => {
+      el.textContent = (icons[state] || '○') + ' ' + (msg || '');
+      el.style.color = colors[state] || '#9ca3af';
     });
-   
-        // Update all connectFileBtn buttons on the page
-    document.querySelectorAll('#connectFileBtn').forEach(btn => {
-        if (state === 'connected' || state === 'saving') {
-            btn.textContent = 'Connected to Database';
-            btn.style.background  = '#22c55e';
-            btn.style.color       = '#fff';
-            btn.style.borderColor = '#22c55e';
-        } else if (state === 'error') {
-            btn.textContent = 'Database Error';
-            btn.style.background  = '#ef4444';
-            btn.style.color       = '#fff';
-            btn.style.borderColor = '#ef4444';
-        }
+
+    // Update every connect button (navbar + calendar view both use .ss-connect-btn)
+    document.querySelectorAll('#connectFileBtn, #connectFileBtnCal').forEach(btn => {
+      if (state === 'connected' || state === 'saving') {
+        btn.textContent = 'Connected to Database';
+        btn.style.background  = '#22c55e';
+        btn.style.color       = '#fff';
+        btn.style.borderColor = '#22c55e';
+      } else if (state === 'error') {
+        btn.textContent = 'Database Error';
+        btn.style.background  = '#ef4444';
+        btn.style.color       = '#fff';
+        btn.style.borderColor = '#ef4444';
+      }
     });
   }
 
@@ -89,7 +90,9 @@ const SS_WP = (() => {
 
   /**
    * Replaces the original loadStateFromStorage() / connectToDataFile() flow.
-   * Fetches the full payload from the WP REST API and calls applyLoadedState().
+   * Fetches the full payload from the WP REST API and calls applyLoadedState(),
+   * then re-resolves the current user's role so the UI reflects the latest
+   * role assignment from the database.
    */
   async function loadFromApi() {
     setStatus('saving', 'Loading…');
@@ -97,6 +100,8 @@ const SS_WP = (() => {
       const payload = await apiFetch('/data');
       if (payload && Array.isArray(payload.jobs)) {
         applyLoadedState(payload, { fromEmbedded: false });
+        if (window.resolveUserRole) window.resolveUserRole(window.currentUserName);
+        if (window.applyRoleUI)     window.applyRoleUI();
         renderSchedule();
         setStatus('connected', 'Loaded from database');
       }
@@ -178,49 +183,27 @@ const SS_WP = (() => {
    * (after all variable declarations but before event listeners).
    *
    * It:
-   *  1. Hides the "Connect to JSON" button (no file picker needed)
+   *  1. Re-purposes the "Connect" buttons as "Reload from Database"
    *  2. Patches saveStateToStorage and saveToConnectedFile to use the API
    *  3. Loads initial data from the API
    *  4. Starts the poll
    */
   function init() {
 
-    // ── 1. Hide/replace FSA UI elements that no longer apply ────────────────
-    const connectBtn = document.getElementById('connectFileBtn');
-    if (connectBtn) {
-      // Re-purpose it as a "reload from DB" button
-      connectBtn.textContent = 'Reload from Database';
-      connectBtn.style.background  = '#22c55e';
-      connectBtn.style.color       = '#fff';
-      connectBtn.style.borderColor = '#22c55e';
-      connectBtn.onclick = function() { loadFromApi(); };
-    }
+    // ── 1. Re-purpose all Connect buttons as reload triggers ────────────────
+    document.querySelectorAll('#connectFileBtn, #connectFileBtnCal').forEach(btn => {
+      btn.textContent = 'Reload from Database';
+      btn.style.background  = '#22c55e';
+      btn.style.color       = '#fff';
+      btn.style.borderColor = '#22c55e';
+      btn.onclick = function() { loadFromApi(); };
+    });
 
-    // * correct role assigned to user
-async function loadFromApi() {
-    setStatus('saving', 'Loading…');
-    try {
-        const payload = await apiFetch('/data');
-        if (payload && Array.isArray(payload.jobs)) {
-            applyLoadedState(payload, { fromEmbedded: false });
-            if (window.resolveUserRole) {
-                window.resolveUserRole(window.currentUserName);
-            }
-            if (window.applyRoleUI) window.applyRoleUI();
-            renderSchedule();
-            setStatus('connected', 'Loaded from database');
-        }
-    } catch (e) {
-        setStatus('error', 'Could not load data');
-        console.error('[SS_WP] loadFromApi failed', e);
-    }
-}
     // ── 2. Patch global save functions ──────────────────────────────────────
     //  The original app calls saveStateToStorage() after every edit.
     //  We replace it with our API save, and also write to localStorage as a
     //  local cache so back/forward works without a round-trip.
     window.saveStateToStorage = function() {
-      // Keep localStorage as a fast local cache
       try {
         const payload = buildStatePayload();
         localStorage.setItem('studioSchedulerState_v1', JSON.stringify(payload));
@@ -258,10 +241,7 @@ async function loadFromApi() {
       window._ssLastLoadedAt = new Date();
     });
 
-    // ── 4. Ensure user name (same as original) now moved to app.js ───────────────────────────────
-    //ensureUserName();
-
-    // ── 5. Start background poll ─────────────────────────────────────────────
+    // ── 4. Start background poll ─────────────────────────────────────────────
     startPoll(900000); // 15 minutes
   }
 

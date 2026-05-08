@@ -243,7 +243,9 @@ function ss_api_put_settings( WP_REST_Request $request ) {
     if ( ! is_array( $data ) ) {
         return new WP_Error( 'invalid_data', 'Expected a JSON object.', [ 'status' => 400 ] );
     }
-    ss_db_update_settings( $data );
+    $allowed = [ 'anchorDate', 'currentHorizonDays', 'lastEditedBy', 'lastEditedAt' ];
+    $safe    = array_intersect_key( $data, array_flip( $allowed ) );
+    if ( $safe ) ss_db_update_settings( $safe );
     return rest_ensure_response( [ 'success' => true ] );
 }
 
@@ -359,17 +361,26 @@ function ss_db_upsert_job( array $job ) {
 }
 
 /**
- * Bulk-replace all jobs.
- * Deletes all existing rows, then inserts the new set in one transaction.
- * This matches the original behaviour where saving the JSON file replaced it entirely.
+ * Bulk-replace all jobs inside a transaction so a mid-insert failure
+ * never leaves the table in a partially-empty state.
  */
 function ss_db_bulk_replace_jobs( array $jobs ) {
     global $wpdb;
     $table = $wpdb->prefix . 'ss_jobs';
+
+    $wpdb->query( 'START TRANSACTION' );
     $wpdb->query( "DELETE FROM `{$table}`" );
+
     foreach ( $jobs as $job ) {
-        ss_db_upsert_job( (array) $job );
+        $result = ss_db_upsert_job( (array) $job );
+        if ( is_wp_error( $result ) || $wpdb->last_error ) {
+            $wpdb->query( 'ROLLBACK' );
+            return false;
+        }
     }
+
+    $wpdb->query( 'COMMIT' );
+    return true;
 }
 
 function ss_db_get_all_users() {
@@ -391,9 +402,12 @@ function ss_db_get_all_users() {
 function ss_db_bulk_replace_users( array $users ) {
     global $wpdb;
     $table = $wpdb->prefix . 'ss_users';
+
+    $wpdb->query( 'START TRANSACTION' );
     $wpdb->query( "DELETE FROM `{$table}`" );
+
     foreach ( $users as $u ) {
-        $u = (array) $u;
+        $u    = (array) $u;
         $lobs = is_array( $u['lobs'] ?? null )
             ? wp_json_encode( $u['lobs'] )
             : ( is_string( $u['lobs'] ?? null ) ? wp_json_encode( array_map( 'trim', explode( ',', $u['lobs'] ) ) ) : '[]' );
@@ -404,7 +418,14 @@ function ss_db_bulk_replace_users( array $users ) {
             'lobs'      => $lobs,
             'functions' => $fns,
         ], [ '%s', '%s', '%s', '%s' ] );
+        if ( $wpdb->last_error ) {
+            $wpdb->query( 'ROLLBACK' );
+            return false;
+        }
     }
+
+    $wpdb->query( 'COMMIT' );
+    return true;
 }
 
 function ss_db_get_all_settings() {

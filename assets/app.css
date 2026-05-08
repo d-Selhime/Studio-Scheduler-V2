@@ -1316,4 +1316,709 @@ body.input-view .schedule-header div {
   cursor: pointer;
 }
 
+/* ── V2: classes extracted from template inline styles ───────────────────── */
+
+/* Navbar */
+.nav-user-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.nav-role-badge {
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: #fff;
+  background: #6b7280;
+  padding: 2px 8px;
+  border-radius: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  min-width: 5em;
+  text-align: center;
+}
+.nav-user-btn {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #0ea5e9;
+  cursor: pointer;
+  white-space: nowrap;
+  padding: 5px 10px;
+  border-radius: 6px;
+  border: 1px solid #0ea5e9;
+  background: rgba(14, 165, 233, 0.08);
+}
+.nav-not-you {
+  font-size: 0.78rem;
+  color: #94a3b8;
+  cursor: pointer;
+  white-space: nowrap;
+  text-decoration: underline;
+}
+.nav-db-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: 12px;
+}
+.nav-status-text {
+  font-size: 0.75rem;
+  color: #9ca3af;
+}
+.nav-connect-btn {
+  font-size: 0.72rem;
+  padding: 3px 10px;
+  border-radius: 6px;
+  border: 1px solid #ef4444;
+  background: #ef4444;
+  color: #fff;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+/* Update banner (calendar view only) */
+.update-banner-cal {
+  background: #f97316;
+  color: #fff;
+  padding: 8px 16px;
+  border-radius: 6px;
+  margin-bottom: 10px;
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+.update-banner-msg {
+  flex: 1;
+  font-size: 0.85rem;
+}
+.update-banner-btns {
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
+}
+.update-banner-reload {
+  background: #fff;
+  color: #f97316;
+  border: none;
+  padding: 4px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+.update-banner-dismiss {
+  background: rgba(255, 255, 255, 0.25);
+  color: #fff;
+  border: none;
+  padding: 4px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.8rem;
+}
+
+/* Window label */
+.window-label {
+  margin-bottom: 8px;
+  font-size: 0.8rem;
+  color: var(--muted);
+  text-align: center;
+}
+
+/* Small button variant */
+.btn-sm {
+  font-size: 0.72rem;
+  padding: 4px 10px;
+}
+
+/* Danger outline button */
+.btn-danger-outline {
+  border-color: #b91c1c;
+  color: #f97373;
+}
+
+/* Primary dark button (job form modal Save) */
+.btn-primary-dark {
+  background: #00388f;
+  color: #fff;
+  border-color: #00388f;
+  font-weight: 700;
+}
+
+/* SLA button */
+.btn-sla {
+  font-size: 0.7rem;
+  padding: 2px 8px;
+  height: 22px;
+  border-radius: 5px;
+  border: 1px solid #009fdb;
+  background: #fff;
+  color: #009fdb;
+  font-weight: 600;
+  cursor: pointer;
+  line-height: 1;
+}
+
+/* Form layout helpers */
+.form-dates-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+.form-divider-v {
+  width: 1px;
+  background: #bdc2c7;
+  align-self: stretch;
+  margin: 0 4px;
+  flex-shrink: 0;
+}
+.form-tasktime-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 20px 0 8px;
+}
+.est-rounds-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.est-rounds-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #00388f;
+  white-space: nowrap;
+}
+.est-rounds-slider {
+  width: 90px;
+  height: 4px;
+  accent-color: #009fdb;
+  cursor: pointer;
+  padding: 0;
+  background: none;
+  border: none;
+  box-shadow: none;
+}
+.est-rounds-value {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #009fdb;
+  min-width: 48px;
+  text-align: right;
+}
+.job-notes-textarea {
+  width: 100%;
+  min-height: 80px;
+  padding: 8px 10px;
+  border-radius: 6px;
+  border: 1px solid #cbd5e1;
+  background: #ffffff;
+  color: #111827;
+  font: inherit;
+  font-size: 0.9em;
+  resize: vertical;
+}
+.form-actions {
+  margin-top: 14px;
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.form-actions-right {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+/* Summary sidebar KPI cells */
+.summary-kpi-row {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+.summary-kpi-cell {
+  flex: 1;
+  background: #fff;
+  border: 1px solid #009fdb;
+  border-radius: 10px;
+  padding: 6px 8px;
+  text-align: center;
+}
+.summary-kpi-title {
+  font-size: 0.55rem;
+  color: #00388f;
+  font-weight: 700;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.summary-kpi-value {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #00388f;
+}
+.summary-hours-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: #00388f;
+  margin-bottom: 6px;
+}
+
+/* Calendar toolbar */
+.cal-toolbar-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  gap: 12px;
+}
+.cal-toolbar-actions {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  flex-shrink: 0;
+}
+.cal-toolbar-filters {
+  display: flex;
+  gap: 8px;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  width: 100%;
+  justify-content: space-between;
+  padding-top: 20px;
+}
+.cal-filter-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+}
+.cal-filter-label {
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+.cal-nav-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding-top: 16px;
+}
+
+/* Team panel */
+.team-panel-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  user-select: none;
+}
+.team-panel-chevron {
+  font-size: 0.9rem;
+  color: #009fdb;
+  font-weight: 700;
+}
+.team-panel-hint {
+  font-size: 0.72rem;
+  color: #6b7280;
+  margin-bottom: 10px;
+}
+.team-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.82rem;
+}
+.team-table-head {
+  border-bottom: 2px solid #e5e7eb;
+}
+.team-th {
+  text-align: left;
+  padding: 4px 8px;
+  color: #00388f;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.btn-add-person {
+  margin-top: 10px;
+  font-size: 0.78rem;
+  padding: 4px 12px;
+  border-radius: 6px;
+  border: 1px solid #009fdb;
+  background: #fff;
+  color: #009fdb;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+/* Status report toolbar */
+.sr-toolbar-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  width: 100%;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 14px;
+}
+.sr-toolbar-actions {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.btn-sr-add {
+  font-size: 0.78rem;
+  padding: 4px 12px;
+  border-radius: 6px;
+  border: 1px solid #009fdb;
+  background: #009fdb;
+  color: #fff;
+  font-weight: 600;
+  cursor: pointer;
+}
+.btn-sr-secondary {
+  font-size: 0.78rem;
+  padding: 4px 12px;
+  border-radius: 6px;
+  border: 1px solid #6b7280;
+  background: #fff;
+  color: #374151;
+  font-weight: 600;
+  cursor: pointer;
+}
+.btn-sr-export {
+  font-size: 0.78rem;
+  padding: 4px 12px;
+  border-radius: 6px;
+  border: 1px solid #00388f;
+  background: #00388f;
+  color: #fff;
+  font-weight: 600;
+  cursor: pointer;
+}
+.sr-filter-bar {
+  border-top: 1px solid #e5e7eb;
+  padding-top: 12px;
+}
+.sr-filter-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+}
+.sr-filter-label {
+  font-size: 0.8rem;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+/* Modal shared helpers */
+.modal-subtitle {
+  font-size: 0.8rem;
+  color: var(--muted);
+  margin-bottom: 12px;
+}
+.modal-badge-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 14px;
+  flex-wrap: wrap;
+}
+.modal-lob-badge {
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 10px;
+  background: #009fdb;
+  color: #fff;
+}
+.modal-priority-badge {
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 10px;
+  background: #6b7280;
+  color: #fff;
+}
+.modal-type-badge {
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 10px;
+  background: #f3f4f6;
+  color: #374151;
+  border: 1px solid #e5e7eb;
+}
+.modal-loe-badge {
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 10px;
+  background: #f3f4f6;
+  color: #374151;
+  border: 1px solid #e5e7eb;
+}
+.modal-section-title {
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #6b7280;
+  margin-bottom: 6px;
+}
+.modal-section-border {
+  margin-bottom: 14px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--border);
+}
+.modal-three-col {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 10px;
+}
+.modal-four-col {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+}
+.modal-five-col {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 10px;
+}
+.modal-total-assets {
+  font-weight: 700;
+}
+.modal-cd-placements {
+  font-size: 0.75rem;
+  color: #6b7280;
+  margin-bottom: 14px;
+}
+.modal-cd-placements-value {
+  font-weight: 600;
+  color: #374151;
+}
+.modal-created-row {
+  padding-top: 10px;
+  border-top: 1px solid var(--border);
+  font-size: 0.75rem;
+  color: #6b7280;
+  margin-bottom: 10px;
+}
+.modal-created-by {
+  font-weight: 600;
+}
+.modal-notes-row {
+  padding-top: 10px;
+  border-top: 1px solid var(--border);
+}
+.modal-notes-body {
+  font-size: 0.85rem;
+  color: #111827;
+  white-space: pre-wrap;
+  line-height: 1.5;
+}
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 16px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+}
+.modal-comments-section {
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px solid var(--border);
+}
+.modal-comments-list {
+  max-height: 180px;
+  overflow-y: auto;
+  margin-bottom: 10px;
+}
+.modal-comment-input-row {
+  display: flex;
+  gap: 6px;
+  align-items: flex-end;
+}
+.modal-comment-textarea {
+  flex: 1;
+  padding: 6px 8px;
+  border-radius: 6px;
+  border: 1px solid #d1d5db;
+  font: inherit;
+  font-size: 0.82rem;
+  resize: none;
+  color: #111827;
+}
+.btn-comment-submit {
+  padding: 6px 14px;
+  border-radius: 6px;
+  border: 1px solid #009fdb;
+  background: #009fdb;
+  color: #fff;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.modal-card-tall {
+  max-width: 700px;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Excel map modal */
+.excel-map-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 10px;
+  flex-wrap: wrap;
+}
+.excel-map-hint {
+  font-size: 0.82rem;
+  color: #6b7280;
+  margin: 0;
+  flex: 1;
+}
+.excel-sheet-selector-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+.excel-sheet-label {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #374151;
+  white-space: nowrap;
+}
+.excel-sheet-select {
+  font-size: 0.82rem;
+  height: 30px;
+  border-radius: 4px;
+  border: 1px solid #cbd5e1;
+  background: #fff;
+  color: #111827;
+  padding: 2px 8px;
+}
+.excel-map-table-wrap {
+  flex: 1;
+  overflow-y: auto;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+}
+.excel-map-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.82rem;
+}
+.excel-map-thead {
+  background: #f1f5f9;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+.excel-map-th {
+  text-align: left;
+  padding: 6px 10px;
+  font-size: 0.72rem;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border-bottom: 1px solid #e5e7eb;
+}
+.excel-map-footer {
+  margin-top: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding-top: 12px;
+  border-top: 1px solid #e5e7eb;
+}
+.excel-import-mode {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  font-size: 0.82rem;
+  color: #374151;
+}
+.excel-import-mode-label {
+  font-weight: 600;
+}
+.excel-import-mode-option {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  cursor: pointer;
+}
+.excel-map-footer-btns {
+  display: flex;
+  gap: 8px;
+}
+
+/* Job form modal (New Job from Status Report) */
+.job-form-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 900;
+  overflow-y: auto;
+  background: rgba(0, 0, 0, 0.55);
+  padding: 24px 16px;
+}
+.job-form-modal-card {
+  max-width: 960px;
+  margin: 0 auto;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.45);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+.job-form-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 20px;
+  background: #00388f;
+  color: #fff;
+  flex-shrink: 0;
+}
+.job-form-modal-title {
+  font-weight: 700;
+  font-size: 1rem;
+  letter-spacing: 0.02em;
+}
+.job-form-modal-close {
+  background: none;
+  border: none;
+  color: #fff;
+  font-size: 1.6rem;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0 4px;
+}
+.job-form-modal-body {
+  overflow-y: auto;
+  max-height: calc(100vh - 200px);
+}
+.job-form-modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 12px 20px;
+  border-top: 1px solid #e5e7eb;
+  flex-shrink: 0;
+  background: #f9fafb;
+}
 
