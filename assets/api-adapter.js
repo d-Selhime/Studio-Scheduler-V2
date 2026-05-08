@@ -196,6 +196,26 @@ const SS_WP = (() => {
       connectBtn.onclick = function() { loadFromApi(); };
     }
 
+    // * correct role assigned to user
+async function loadFromApi() {
+    setStatus('saving', 'Loading…');
+    try {
+        const payload = await apiFetch('/data');
+        if (payload && Array.isArray(payload.jobs)) {
+            applyLoadedState(payload, { fromEmbedded: false });
+            // Re-resolve role now that users array is populated
+            if (window.resolveUserRole) {
+                resolveUserRole(currentUserName);
+            }
+            if (window.applyRoleUI) applyRoleUI();
+            renderSchedule();
+            setStatus('connected', 'Loaded from database');
+        }
+    } catch (e) {
+        setStatus('error', 'Could not load data');
+        console.error('[SS_WP] loadFromApi failed', e);
+    }
+}
     // ── 2. Patch global save functions ──────────────────────────────────────
     //  The original app calls saveStateToStorage() after every edit.
     //  We replace it with our API save, and also write to localStorage as a

@@ -655,6 +655,8 @@ let currentUserName =
 let inMemoryLastEditedAt = null;
 let pollIntervalId = null;
 
+window.currentUserName = currentUserName;
+
 // ── LOB ownership groups ─────────────────────────────────────────────
 const LOB_GROUPS = {
   BUS: ["BUS"],
@@ -786,6 +788,7 @@ function resolveUserRole(name) {
     localStorage.removeItem("schedulerLobGroup");
   }
 }
+window.resolveUserRole = resolveUserRole;
 
 function canEditLob(lob) {
   if (currentUserRole === "admin" || currentUserRole === "manager") return true;
@@ -929,6 +932,7 @@ function applyRoleUI() {
     if (activeTab && activeTab.dataset.view === "status") showView("calendar");
   }
 }
+window.applyRoleUI = applyRoleUI;
 
 function refreshDatalistsFromUsers() {
   if (!users || !users.length) return;
