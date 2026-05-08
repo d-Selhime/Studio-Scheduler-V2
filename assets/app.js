@@ -733,17 +733,13 @@ function resolveUserRole(name) {
   }
   // Bootstrap mode: no users list and no file connected yet — first-time setup only
   if (!users || users.length === 0) {
-    if (!connectedFileHandle) {
-      currentUserRole = "admin";
-      currentUserLobs = [];
-      myLobGroup = null;
-      localStorage.removeItem("schedulerLobGroup");
-    } else {
-      currentUserRole = "view";
-      currentUserLobs = [];
-    }
+    // In WordPress mode, never grant admin in bootstrap — 
+    // wait for users to load from the API
+    currentUserRole = "view";
+    currentUserLobs = [];
     return;
   }
+
   if (!name) {
     currentUserRole = "view";
     currentUserLobs = [];
